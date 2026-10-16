@@ -1,202 +1,402 @@
-# StudentHub — Students Database CRUD Application
+# StudentHub — Student Database Management System
 
-**Internship Project for EWB Edu Tech Pvt. Ltd.**
+A full-stack student management application developed for the **EWB Edu Tech Pvt. Ltd. Python Backend Development Internship Assignment**.
 
-A modern, professional, responsive SaaS dashboard web application for managing student database records, academic enrollments, course distributions, and database queries.
+StudentHub provides a web interface for creating, viewing, searching, updating, and deleting student records. The intended architecture uses a React frontend, a Python FastAPI backend, and an SQLite database for persistent storage. An optional Ollama-powered assistant can answer natural-language questions about the database.
 
-Built with **React 19, TypeScript, Tailwind CSS, Lucide Icons, Recharts, and Axios** on the frontend, powered by a **Python FastAPI, SQLite, and SQLAlchemy** backend.
+> **Implementation note:** This README describes the intended setup. Confirm that the generated project contains the listed files and endpoints, and adjust commands or endpoint names to match the actual code before submission. Do not claim that a feature works until it has been tested.
 
----
+## Features
 
-## 🚀 Quick Start Guide (Windows Terminal Commands)
+### Required functionality
+- Create student records.
+- List and search student records.
+- View an individual student's details.
+- Update a student's details.
+- Delete a student after confirmation.
+- Validate required fields and contact information.
+- Store records persistently in SQLite.
+- Handle invalid input and missing records with appropriate errors.
+- Provide interactive API documentation through FastAPI's Swagger UI.
 
-To run the application locally on Windows, open **two separate terminal windows** (Command Prompt or PowerShell).
+### Interface
+- Responsive dashboard and student table.
+- Student creation and editing forms.
+- Search, filters, and pagination where implemented.
+- Loading, empty, success, and error states.
+- Dashboard statistics based on backend data, where implemented.
 
-### Terminal 1: Start the Python FastAPI Backend
+### Optional extension
+- Local AI assistant using Ollama.
+- Natural-language questions grounded in records retrieved by the backend.
+- The core CRUD application should remain usable when AI is disabled.
 
-```cmd
-# 1. Navigate to the backend directory
+## Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React, TypeScript, Vite |
+| Styling | Tailwind CSS |
+| Icons | Lucide React |
+| API communication | Axios |
+| Backend | Python, FastAPI, Uvicorn |
+| ORM | SQLAlchemy |
+| Validation | Pydantic |
+| Database | SQLite |
+| Optional AI | Ollama |
+| Testing | Pytest, FastAPI TestClient |
+
+## Project Structure
+
+The exact structure may differ depending on how the project was generated. A recommended layout is:
+
+```text
+studenthub/
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── types/
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   ├── package.json
+│   └── .env.example
+├── backend/
+│   ├── app/
+│   │   ├── main.py
+│   │   ├── database.py
+│   │   ├── models.py
+│   │   ├── schemas.py
+│   │   ├── crud.py
+│   │   ├── routers/
+│   │   └── services/
+│   ├── tests/
+│   ├── scripts/
+│   └── requirements.txt
+├── .gitignore
+└── README.md
+```
+
+## Requirements
+
+Install the following tools:
+
+- Python 3.11 or newer
+- Node.js and npm (a current LTS release is recommended)
+- Git, if you plan to publish the project to GitHub
+
+The optional AI feature also requires [Ollama](https://ollama.com/).
+
+## Setup and Run
+
+Open two terminal windows: one for the backend and one for the frontend.
+
+### 1. Start the Python backend
+
+Open a terminal in the project directory, then navigate to the backend folder:
+
+```powershell
 cd backend
+```
 
-# 2. Create Python virtual environment
-python -m venv venv
+Create a virtual environment:
 
-# 3. Activate the virtual environment
-# In Command Prompt (cmd.exe):
-venv\Scripts\activate.bat
-# OR in PowerShell:
-# venv\Scripts\Activate.ps1
+```powershell
+python -m venv .venv
+```
 
-# 4. Install backend dependencies
+Activate it on Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+If PowerShell blocks activation, you can use Command Prompt instead:
+
+```bat
+.venv\Scripts\activate.bat
+```
+
+Install backend dependencies:
+
+```powershell
+python -m pip install --upgrade pip
 pip install -r requirements.txt
-
-# 5. (Optional) Populate sample student records
-python -m backend.seed
-
-# 6. Run automated CRUD test suite
-python -m backend.test_api
-
-# 7. Launch the FastAPI server on port 8000
-uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-Backend will be running at:
-- **API URL**: `http://127.0.0.1:8000`
-- **Interactive Swagger Docs**: `http://127.0.0.1:8000/docs`
+Configure environment variables using the project's `.env.example`, if the application uses a `.env` file. Copy it to `.env` and adjust values as needed. Never commit `.env`.
 
----
+Start the server using the module path that matches the actual project.
 
-### 🌐 Optional: Connecting with Cloud Preview (Development Tunnel)
-If viewing the frontend from Google AI Studio cloud preview, expose port 8000 via a secure tunnel:
-```cmd
-ngrok http 8000
+For a backend where `main.py` is inside `backend/app/`:
+
+```powershell
+python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
-Then paste the HTTPS forwarding URL (e.g. `https://your-tunnel.ngrok-free.app`) in the StudentHub **Settings** page and click **Save & Connect**.
 
----
+For a backend where the application module is `backend/main.py` and you run the command from the repository root:
 
-### Terminal 2: Start the React Frontend
+```powershell
+python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
+```
 
-In the project root directory:
+Use only the command matching your files. Keep the backend terminal open.
 
-```cmd
-# 1. Install frontend npm dependencies
+Once running, open:
+
+- API documentation: http://127.0.0.1:8000/docs
+- OpenAPI schema: http://127.0.0.1:8000/openapi.json
+- Health check: http://127.0.0.1:8000/health
+
+### 2. Initialize the database
+
+If the application creates its SQLite tables automatically on startup, no separate initialization command may be necessary.
+
+If a seed script is included, run it from the directory specified by the project. For example:
+
+```powershell
+python scripts/seed_data.py
+```
+
+Use fictional sample data only. Confirm the actual script path before running the command.
+
+The SQLite database file is commonly named `students.db`. Its exact location depends on the configured database URL.
+
+### 3. Start the frontend
+
+Open a second terminal at the frontend directory:
+
+```powershell
+cd frontend
 npm install
+```
 
-# 2. Start the Vite development server
+Create the frontend environment file if the project supports it. For a local backend, the setting may be:
+
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000
+```
+
+Then start the development server:
+
+```powershell
 npm run dev
 ```
 
-Frontend will be running at:
-- **Local URL**: `http://localhost:3000`
+Open the local URL printed by Vite in the terminal, commonly http://localhost:5173.
 
-Open your web browser and navigate to `http://localhost:3000`.
+Keep both the frontend and backend running during development.
 
----
+> **Remote preview note:** If the frontend is hosted in an online builder or remote preview, `127.0.0.1` may refer to that preview environment rather than your computer. Configure a backend URL reachable from the preview, use HTTPS when required, and configure FastAPI CORS for the exact frontend origin. Never expose a development server publicly without considering security.
 
-## 🧪 Testing the Complete CRUD Workflow
+## Student Data Fields
 
-Follow this step-by-step checklist to test and demonstrate every feature during your internship project review:
+A student record may include:
 
-### 1. Creating a Student Record (Create)
-1. Click **"Add Student"** in the top header or sidebar.
-2. Fill in:
-   - **Full Name**: `Aarav Sharma`
-   - **Date of Birth**: Select a past date (e.g., `2004-05-14`).
-   - **Course**: Select `Computer Science & Engineering`.
-   - **Email**: `aarav.sharma@ewbedutech.edu`
-   - **Phone**: `+91 98765 43210`
-   - **Enrollment Date**: `2024-08-01`
-   - **Address**: `42 Tech Park Road, Whitefield, Bengaluru`
-3. Click **"Create Student"**.
-4. Observe the toast notification: *"Student Created Successfully with generated ID STU-1001"*.
-5. The application navigates automatically to the **Student Details Page**.
+| Field | Description |
+|---|---|
+| `id` | Unique ID generated by the backend |
+| `name` | Student's name (required) |
+| `date_of_birth` | Date of birth in `YYYY-MM-DD` format (required) |
+| `email` | Email address, if supplied |
+| `phone` | Contact number, if supplied |
+| `course` | Course name (optional) |
+| `address` | Address (optional) |
+| `enrollment_date` | Enrollment date (optional) |
 
-### 2. Viewing Student Details (Read)
-1. On the **Student Details Page**, verify all fields:
-   - Full name, generated Student ID badge (`STU-1001`), course name, computed age.
-   - Contact details (with one-click clipboard copy buttons for email and phone).
-   - Residential address.
-2. Go to **"All Students"** in the sidebar:
-   - Verify the student appears in the main table with tabular figures.
-   - Check the pagination footer displaying total student count.
+The application should require at least one contact method—email or phone—and reject invalid values. Email uniqueness should be enforced if that is how the backend is implemented.
 
-### 3. Searching and Filtering Records
-1. In the search box, type `Aarav` or `STU-1001`.
-2. Notice the live debounced filtering instantly matching the student.
-3. Test the **Course dropdown filter** to filter by specific program.
-4. Test the **Born From / Born To** date pickers.
-5. Click **"Reset All Filters"** to restore full database view.
+Use fictional student data for demonstrations and tests.
 
-### 4. Editing a Student Record (Update)
-1. On the student table row, click the three-dots action menu (`...`) and select **"Edit Student"** (or click **"Edit Record"** on the details page).
-2. Modify the course to `Data Science & AI` or update the phone number.
-3. Click **"Save Changes"**.
-4. Notice the success toast and see the updated fields immediately reflected on the page and in the database.
+## API Reference
 
-### 5. Deleting a Student Record (Delete)
-1. On any student row or details page, click **"Delete"**.
-2. Notice the accessible **Confirmation Dialog** appearing with the student's name and ID.
-3. Click **"Delete Student"**.
-4. Confirm the record is deleted from the table and the total student counter decrements.
+The following routes are recommended for the assignment. Confirm them in `/docs`, because the actual implementation may use different paths or response formats.
 
-### 6. Verifying Persistence in SQLite
-Verify that your changes are written permanently to SQLite and persist after refreshing the browser:
-
-```cmd
-cd backend
-sqlite3 students.db
-```
-Inside SQLite prompt:
-```sql
-.headers on
-.mode column
-SELECT id, student_id, name, course, email FROM students;
-.quit
-```
-Refresh the browser window (`F5` or `Ctrl+R`) — all records remain intact in the UI directly from SQLite.
-
-### 7. AI Assistant Queries
-1. Navigate to **"AI Assistant"** in the sidebar.
-2. Try the preset query buttons:
-   - *"How many students are registered?"*
-   - *"How many students are enrolled in each course?"*
-   - *"List students born after 2004."*
-3. The backend executes real-time queries against SQLite records and formats intelligent answers.
-
----
-
-## 🏛️ Project Architecture
-
-```
-├── backend/
-│   ├── database.py       # SQLAlchemy SQLite engine & session management
-│   ├── models.py         # Student SQLAlchemy ORM model
-│   ├── schemas.py        # Pydantic schemas with validation & contact rule
-│   ├── crud.py           # DB operations, filters, pagination, metrics & AI query engine
-│   ├── main.py           # FastAPI application with CORS and REST endpoints
-│   ├── seed.py           # Database seeder with sample student records
-│   ├── requirements.txt  # Python package dependencies
-│   └── README.md         # Dedicated backend setup & SQLite guide
-├── src/
-│   ├── assets/images/    # Generated administrator avatar
-│   ├── components/
-│   │   ├── ai/           # AIChatInterface
-│   │   ├── common/       # PageHeader, SummaryCard, Pagination, Skeletons, Error/Empty states, ConfirmDeleteDialog
-│   │   ├── layout/       # AppSidebar, AppHeader, AppLayout
-│   │   └── students/     # StudentTable, StudentFilters, StudentForm, StudentDetailCard
-│   ├── context/          # ToastContext, BackendStatusContext
-│   ├── pages/            # DashboardPage, StudentsListPage, AddStudentPage, EditStudentPage, StudentDetailsPage, AIAssistantPage, SettingsPage
-│   ├── services/         # Centralized Axios API service with standardized error handling
-│   ├── types/            # TypeScript interfaces
-│   ├── App.tsx           # Router and top-level providers
-│   ├── index.css         # Tailwind CSS styling and custom scrollbars
-│   └── main.tsx          # React application entrypoint
-├── .env.example          # Environment variable template
-├── package.json          # Node dependencies and scripts
-└── vite.config.ts        # Vite configuration with API proxy
-```
-
----
-
-## 📋 REST API Endpoints
-
-| Method | Endpoint | Description |
+| Method | Endpoint | Purpose |
 |---|---|---|
-| `GET` | `/health` | Check backend connectivity and total student count |
-| `GET` | `/students` | List students with search, course filter, DOB filter, pagination |
-| `POST` | `/students` | Create new student with auto-generated ID |
-| `GET` | `/students/{id}` | Retrieve single student by ID or `student_id` |
-| `PUT` | `/students/{id}` | Replace existing student record |
-| `PATCH` | `/students/{id}` | Partially update student fields |
-| `DELETE` | `/students/{id}` | Permanently delete student record |
-| `GET` | `/dashboard-metrics` | Retrieve live metric counts and course distribution |
-| `POST` | `/ai/ask` | Natural language database query assistant |
+| `POST` | `/students` | Create a student |
+| `GET` | `/students` | List and filter students |
+| `GET` | `/students/{student_id}` | Retrieve one student |
+| `PUT` | `/students/{student_id}` | Replace editable student details |
+| `PATCH` | `/students/{student_id}` | Update selected fields |
+| `DELETE` | `/students/{student_id}` | Delete a student |
+| `GET` | `/health` | Application health, if implemented |
+| `GET` | `/health/database` | Database connectivity, if implemented |
+| `GET` | `/dashboard/stats` | Dashboard metrics, if implemented |
+| `POST` | `/ai/ask` | Optional AI question endpoint |
 
----
+### Example: Create a student
 
-## 💼 Evaluation & Review Highlights
-- **No Mock Fallbacks**: Connected to real REST endpoints with persistent SQLite storage.
-- **Accessible & Responsive**: Tested across desktop (1440px), tablet (768px), and mobile (375px).
-- **Anti-AI Slop**: Clean editorial typography (Plus Jakarta Sans), tabular figures (`tabular-nums`), restrained shadows, zero pill-badge clutter, and intentional whitespace.
-- **Enterprise Error Handling**: Clear human-readable error banners with retry and troubleshooting hints.
+Send a `POST` request to `/students` with a JSON body such as:
+
+```json
+{
+  "name": "Aarav Sharma",
+  "date_of_birth": "2005-04-12",
+  "email": "aarav.example@example.com",
+  "phone": "9000000001",
+  "course": "Computer Science",
+  "address": "Hyderabad",
+  "enrollment_date": "2026-08-01"
+}
+```
+
+The example uses fictional information. Your API may require a slightly different request schema; check `/docs`.
+
+### Example: List students
+
+```http
+GET /students
+```
+
+If implemented, filtering and pagination may be available through query parameters, for example:
+
+```http
+GET /students?search=Aarav&skip=0&limit=10
+```
+
+### Example: Retrieve a student
+
+```http
+GET /students/1
+```
+
+Replace `1` with an ID returned by your API.
+
+### Example: Update a student
+
+Send a `PATCH` request to `/students/1`:
+
+```json
+{
+  "course": "Artificial Intelligence"
+}
+```
+
+A partial update should modify only the supplied fields if the backend implements PATCH semantics.
+
+### Example: Delete a student
+
+```http
+DELETE /students/1
+```
+
+The API may return `204 No Content` after successful deletion. Verify the actual response in Swagger UI.
+
+## Testing the API
+
+1. Start the FastAPI server.
+2. Open http://127.0.0.1:8000/docs.
+3. Expand `POST /students`, choose **Try it out**, and create a fictional student.
+4. Use `GET /students` to verify that the student appears.
+5. Open the student's detail endpoint using the returned ID.
+6. Test `PUT` and `PATCH` to update the record.
+7. Test `DELETE` and then verify the record is no longer returned.
+8. Test an unknown ID and invalid input to verify error handling.
+9. Restart the backend and retrieve the record again to check SQLite persistence.
+
+## Automated Tests
+
+If tests are included in `backend/tests/`, activate the backend virtual environment and run:
+
+```powershell
+python -m pytest
+```
+
+Tests should use a separate temporary database rather than changing the development database.
+
+Do not report that the tests pass until the command has been run and its result checked.
+
+## Optional Ollama AI Assistant
+
+The AI extension is optional and must not be required for CRUD functionality.
+
+1. Install Ollama from https://ollama.com/.
+2. Start Ollama according to its installation instructions.
+3. Download the configured model. For example:
+
+   ```powershell
+   ollama pull llama3.2:1b
+   ```
+
+4. Configure the model name and Ollama base URL in the backend environment settings, if supported.
+5. Enable the AI feature using the configuration expected by the project.
+6. Start or restart the backend.
+7. Test the AI endpoint or the AI Assistant page.
+
+Example question:
+
+```json
+{
+  "question": "How many students are there?"
+}
+```
+
+The backend should retrieve or calculate the relevant information from SQLite and provide grounded context to the model. Do not allow the model to execute unrestricted SQL. If Ollama is unavailable, the application should show an informative message while keeping CRUD operations available.
+
+## Troubleshooting
+
+### The frontend cannot connect to FastAPI
+- Confirm the backend terminal shows that Uvicorn is running.
+- Open `/docs` directly in your browser.
+- Check `VITE_API_BASE_URL`.
+- Restart the frontend after changing environment variables.
+- Verify CORS configuration and the frontend's exact origin.
+- For remote previews, use a backend URL reachable from the preview.
+
+### The app displays an empty student list
+- Confirm the database was initialized.
+- Create a test student through Swagger UI.
+- Check the backend logs for database errors.
+- Verify the application is using the expected SQLite database file.
+
+### Changes disappear after restarting
+- Check the SQLite database URL and file location.
+- Confirm that the application is not using in-memory SQLite.
+- Confirm all CRUD operations write through SQLAlchemy to the persistent database.
+
+### The AI assistant is unavailable
+- Verify that Ollama is installed and running.
+- Confirm the configured model has been downloaded.
+- Check the model name and backend environment settings.
+- Review backend logs without sharing secrets publicly.
+
+### Dependencies fail to install
+- Confirm the correct Python and Node.js versions are installed.
+- Activate the intended virtual environment.
+- Run the installation commands from the correct directory.
+- Review the error output and dependency versions in the project files.
+
+## GitHub Submission
+
+Before publishing:
+
+1. Verify all required source files are present.
+2. Run the backend and frontend locally.
+3. Test all CRUD operations and persistence.
+4. Run the available automated tests.
+5. Remove real student information and credentials.
+6. Confirm `.gitignore` excludes `.env`, virtual environments, caches, and local database files.
+7. Include `requirements.txt`, frontend package files, and this README.
+8. Commit and push the project to your GitHub repository.
+
+Example commands, run from the repository root:
+
+```powershell
+git init
+git add .
+git status
+git commit -m "Build StudentHub student CRUD application"
+git branch -M main
+git remote add origin YOUR_GITHUB_REPOSITORY_URL
+git push -u origin main
+```
+
+Replace `YOUR_GITHUB_REPOSITORY_URL` with your own repository URL. If the repository is already initialized or has a remote, do not repeat those setup commands blindly.
+
+## Project Objective
+
+StudentHub is intended to demonstrate backend development fundamentals through a practical application: REST API design, database persistence, input validation, error handling, frontend integration, and testing.
+
+**Before submission, verify the implementation against the EWB Edu Tech assignment requirements and update this README to match the code that actually exists and has been tested.**
